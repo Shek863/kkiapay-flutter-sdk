@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:stacked_services/stacked_services.dart';
 
+import '../kkiapay/data/remote/pos_apis.dart';
 import 'kkiapayConf.sample.dart';
 
 class Utils {
@@ -12,6 +14,9 @@ class Utils {
   /// Dev tools [logger]
   ///
   static Logger log = Logger();
+
+  /// Retrofit api instance
+  static final client = ApiClient(Dio(BaseOptions(contentType: "application/json")));
 
   ///
   /// Provide current context from anywhere

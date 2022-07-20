@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:ui';
 
 const KKiaPayURL = "https://widget-v2.kkiapay.me";
+const baseUrl = 'https://api-dev.kkiapay.me';
 const KKiaPayRedirectURL = "http://redirect.kkiapay.me";
 const key = "xxxxxxxxxxxxxxxxxxxxxx";
 

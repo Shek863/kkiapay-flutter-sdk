@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kkiapay_flutter_sdk/kkiapay/view/widget_builder_view.dart';
+import 'package:kkiapay_flutter_sdk/kkiapay/view/momoPay/momo_pay_view.dart';
 import './successScreen.dart';
 
 void main() => runApp(App());
@@ -11,6 +11,7 @@ void successCallback(response, context) {
     context,
     MaterialPageRoute(
       builder: (context) => SuccessScreen(
+        status: response['isPaymentSuccess'],
         amount: response['amount'],
         transactionId: response['transactionId'],
       ),
@@ -18,12 +19,12 @@ void successCallback(response, context) {
   );
 }
 
-final kkiapay = KKiaPay(
+final kkiapay = KKiaPayMoMo(
   amount: 1,
-  phone: '61000000',
+  phone: '22961877882',
   data: 'hello world',
-  sandbox: true,
-  apikey: 'xxx',
+  sandbox: false,
+  apikey: 'e1ae34f2ffc687b243df1435024a60ec326fa75f',
   callback: successCallback,
   name: 'JOHN DOE',
   email: 'yourmail@mail.com',
