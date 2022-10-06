@@ -18,6 +18,8 @@ class Utils {
   /// Retrofit api instance
   static final client = ApiClient(Dio(BaseOptions(contentType: "application/json")));
 
+  static final clientLive = ApiClientLive(Dio(BaseOptions(contentType: "application/json")));
+
   ///
   /// Provide current context from anywhere
   ///
@@ -43,6 +45,21 @@ class Utils {
     final base64 = sdkData.toBase64();
     log.d('$KKiaPayURL/?=$base64');
     return '$KKiaPayURL/?=$base64';
+  }
+
+  static void assertError (Object obj, String addCase ,{bool isSplach = false,bool isPaymentCash = false}) async {
+    //obj.printError();
+    switch (obj.runtimeType) {
+      case DioError:
+        final res = (obj as DioError).response;
+        print("Got error : ${res?.statusCode} -> ${res?.statusMessage}");
+        print("... ...... : ${res?.statusCode} -> ${res?.data}");
+        print("... ...... : ${res?.statusCode} -> ${res?.requestOptions.baseUrl}");
+        print("... ...... : ${res?.statusCode} -> ${res?.requestOptions.uri}");
+        break;
+      default:
+        break;
+    }
   }
 
 

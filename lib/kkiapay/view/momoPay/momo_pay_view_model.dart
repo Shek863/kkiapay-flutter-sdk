@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
+import 'package:kkiapay_flutter_sdk/kkiapay/data/remote/pos_apis.dart';
 import 'package:kkiapay_flutter_sdk/kkiapay/data/repos/PaymentRepository.dart';
 import 'package:kkiapay_flutter_sdk/kkiapay/model/paymentRequest.dart';
 import 'package:kkiapay_flutter_sdk/utils/utils.dart';
@@ -62,27 +63,32 @@ class WidgetBuilderViewModel extends BaseViewModel {
       Function(Map<String, dynamic>, BuildContext)? callback, context) async{
     setPaymentRequest(paymentRequest);
     if(channel.isEmpty) {
-      launchPayment((object, context) async {
-        callback!(object, context);
-      },context);
+      /// select process switch 'sandbox' value
+      /// launchPaymentSandbox(...) if true
+      /// launchPaymentLive(...) if false
+      if(data['sandbox']) {
+        launchPaymentSandbox((object, context) async {
+          callback!(object, context);
+        },context);
+      }else{
+        launchPaymentLive((object, context) async {
+          callback!(object, context);
+        },context);
+      }
     }
   }
 
-  late var kSocket = MySocket();
+  late var kSocket = KSocket( baseUrl: Apis.baseUrlSandbox);
 
   /// Payment process
-  /// @first we are using @repoP.getAmountFee :::: to getting real debit amount switch mount and payment methode
-  /// @before we are using @getChannel :::: to getting payment channel to listen payment state
-  /// And @finally we are using @requestPayment :::: to init view
-  Future launchPayment( Function(Map<String, dynamic>, BuildContext)? callback, context) async {
+  /// (1) we are using @repoP.getAmountFee :::: to getting real debit amount switch mount and payment methode
+  /// (2) we are using @getChannel :::: to getting payment channel to listen payment state
+  /// (3) we are using @requestPayment :::: to init view
+  ///
+  Future launchPaymentSandbox( Function(Map<String, dynamic>, BuildContext)? callback, context) async {
     try {
-      /** @first */
-      /*PaymentRepository.getAmountFee(xPublicKey, xPublicKey,
-          AmountFee( details: true, amount: paymentRequest.amount.toString()),
-          onFailure: (object ) {  },
-          onSuccess: (amount) { setAmount(amount.toString()); });*/
 
-      /** @before */
+      /** (2) */
       PaymentRepository.claimChannel( xPublicKey,
           onFailure: (object ) {
             Utils.log.d("PaymentLoadingViewModel",">>> claimChannel: ${object.toString()}");
@@ -97,7 +103,7 @@ class WidgetBuilderViewModel extends BaseViewModel {
 
             // var query = "apikey=${developerAccount.api_key}&contact=${paymentRequest.contact}";
             var query = {"apikey": xPublicKey, "contact": paymentRequest.contact };
-            kSocket = MySocket( queryN: query);
+            kSocket = KSocket( queryN: query , baseUrl: Apis.baseUrlSandbox);
 
             kSocket.onPaymentBack((status, transactionId) {
               setChannel("");
@@ -105,12 +111,64 @@ class WidgetBuilderViewModel extends BaseViewModel {
 
               callback!( { 'requestData': data, 'transactionId': transactionId, 'isPaymentSuccess': status  }, context);
 
-              if (status) {
+              kSocket.disconnect();
+            });
 
+            kSocket.connect(() {
+              Utils.log.d("tag",">>> onConnect");
+              if(kSocket.isConnected()) {
+                Utils.log.d("tag",">>> isConnected == true");
+                /** (3) */
+                PaymentRepository.requestPayment( xPublicKey,
+                    paymentRequest,
+                    onFailure: (object ) {
+                      Utils.log.d("requestPayment",">>> onFailure");
+                      Utils.assertError(object, "");
+                      callback!( { 'requestData': data, 'transactionId': '', 'isPaymentSuccess': false  }, context);
+                    },
+                    onSuccess: (_paymentRequestData) {
+                      Utils.log.d("requestPayment",">>> onSuccess");
+                      setPaymentRequestData(_paymentRequestData!);
+                    });
+              } else{
+                Utils.log.d("tag",">>> isNotConnected");
               }
-              else {
+            });
 
-              }
+          });
+
+    } catch (e) {
+      Utils.log.d("PaymentLoadingViewModel",">>> transactions liveData: $e");
+    }
+  }
+
+  Future launchPaymentLive( Function(Map<String, dynamic>, BuildContext)? callback, context) async {
+    try {
+
+      /** @before */
+      PaymentRepositoryLive.claimChannel( xPublicKey,
+          onFailure: (object ) {
+            Utils.log.d("PaymentLoadingViewModel",">>> claimChannel: ${object.toString()}");
+          },
+          onSuccess: (channel) {
+            Utils.log.d("PaymentLoadingViewModel",">>> claimChannel: onSuccess");
+
+            PaymentRequest _paymentRequest =  paymentRequest;
+            _paymentRequest.contact = channel;
+            Utils.log.d("PaymentLoadingViewModel paymentRequest:::: ",_paymentRequest.toJson());
+            setPaymentRequest(_paymentRequest);
+            setChannel(channel);
+
+            // var query = "apikey=${developerAccount.api_key}&contact=${paymentRequest.contact}";
+            var query = {"apikey": xPublicKey, "contact": paymentRequest.contact };
+            kSocket = KSocket( queryN: query, baseUrl: Apis.baseUrlLive );
+
+            kSocket.onPaymentBack((status, transactionId) {
+              setChannel("");
+              setDate();
+
+              callback!( { 'requestData': data, 'transactionId': transactionId, 'isPaymentSuccess': status  }, context);
+
               kSocket.disconnect();
             });
 
@@ -118,10 +176,12 @@ class WidgetBuilderViewModel extends BaseViewModel {
               Utils.log.d("tag",">>> onConnect");
               if(kSocket.isConnected()) {
                 Utils.log.d("tag",">>> isConnected");
-                PaymentRepository.requestPayment( xPublicKey,
+                PaymentRepositoryLive.requestPayment( xPublicKey,
                     paymentRequest,
                     onFailure: (object ) {
                       Utils.log.d("requestPayment",">>> onFailure");
+                      Utils.assertError(object, "");
+                      callback!( { 'requestData': data, 'transactionId': '', 'isPaymentSuccess': false  }, context);
                     },
                     onSuccess: (_paymentRequestData) {
                       Utils.log.d("requestPayment",">>> onSuccess");

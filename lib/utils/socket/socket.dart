@@ -7,29 +7,18 @@ import '../../kkiapay/data/remote/pos_apis.dart';
 
 late IO.Socket mSocket;
 
-class MySocket {
+class KSocket {
 
   late Map query;
 
   final String tag = "MySocket";
 
-  MySocket ({Map? queryN}) {
+  KSocket ({Map? queryN, required String baseUrl }) {
     query = queryN!;
 
     try {
-      /*if (mSocket != null) {
-        mSocket.disconnect ();
-      }*/
 
-      final option = OptionBuilder().setPath("/api/events")
-      .setPath("/websocket")
-      .enableForceNew()
-      .disableReconnection()
-      .disableAutoConnect()
-      .setQuery(query)
-      .setTransports(['websocket']).build();
-
-      String endPoint = Apis.baseUrl;
+      String endPoint = baseUrl;
 
       mSocket =  IO.io(endPoint, OptionBuilder().setPath("/api/events")
           .setPath("/websocket")

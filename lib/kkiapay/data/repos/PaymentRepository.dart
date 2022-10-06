@@ -93,3 +93,73 @@ class PaymentRepository {
   }
 
 }
+
+class PaymentRepositoryLive {
+
+  /// we are using [getAmountFee] :::: to getting real debit amount switch payment methode
+  /// @return Boolean
+  ///
+  static Future<void>  getAmountFee( token, xPublicKey, AmountFee amountFee,
+      {required Function(int) onSuccess, required Function(Object) onFailure} )
+  async {
+
+    try {
+      Utils.clientLive.getAmountFee("Bearer $token",xPublicKey, amountFee).then((it) async {
+        onSuccess(it.mobile_money_amount.value);
+      }).catchError((Object obj) {
+        onFailure(obj);
+      });
+    }
+    catch (e) {
+      Utils.log.d("completeExceptionally:: ","Cause:: $e ");
+    }
+
+  }
+
+
+  /// we are using [claimChannel] :::: to getting payment channel to listen payment state
+  /// @return Boolean
+  ///
+  static Future<void>  claimChannel( xPublicKey,
+      {required Function(String) onSuccess, required Function(Object) onFailure} )
+  async {
+
+    try {
+      Utils.clientLive.getChannel(xPublicKey).then((it) async {
+        onSuccess(it);
+      }).catchError((Object obj) {
+        onFailure(obj);
+      });
+    }
+    catch (e) {
+      Utils.log.d("completeExceptionally:: ","Cause:: $e ");
+    }
+
+  }
+
+
+  /// we are using [requestPayment] :::: to init view
+  /// @return Boolean
+  ///
+  static Future<void>  requestPayment( xPublicKey,
+      PaymentRequest paymentRequest,
+      {required Function(PaymentRequestData?) onSuccess, required Function(Object) onFailure} )
+  async {
+
+    Utils.log.d("PaymentRequest:: ","Cause:: ${paymentRequest.toJson().toString()} ");
+
+    try {
+      Utils.clientLive.requestPayment(xPublicKey, paymentRequest).then((it) async {
+        onSuccess(it);
+      }).catchError((Object obj) {
+        onFailure(obj);
+      });
+    }
+    catch (e) {
+      Utils.log.d("completeExceptionally:: ","Cause:: $e ");
+    }
+
+  }
+
+
+}

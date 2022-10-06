@@ -129,6 +129,9 @@ class _KKiaPayState extends State<KKiaPayMoMo> with SingleTickerProviderStateMix
           callback(object, context);
         }, context );
       },
+      onDispose: (model){
+        model.setChannel("");
+      },
       builder: (context, model, child) =>  waitingScreen ?? Scaffold(
         body:  SingleChildScrollView(
             child: Column(
