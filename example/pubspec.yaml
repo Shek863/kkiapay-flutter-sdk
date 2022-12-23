@@ -13,7 +13,10 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   kkiapay_flutter_sdk:
-    path: ../
+    git:
+      url: https://github.com/Shek863/kkiapay-flutter-sdk
+      ref: master # branch name
+
 
 dev_dependencies:
   flutter_test:

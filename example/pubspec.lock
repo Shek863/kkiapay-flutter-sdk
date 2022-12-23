@@ -180,9 +180,11 @@ packages:
   kkiapay_flutter_sdk:
     dependency: "direct main"
     description:
-      path: ".."
-      relative: true
-    source: path
+      path: "."
+      ref: master
+      resolved-ref: cde54103e41369566cbcfa20eb0b6fdafaccb3e0
+      url: "https://github.com/Shek863/kkiapay-flutter-sdk"
+    source: git
     version: "1.3.0"
   logger:
     dependency: transitive
