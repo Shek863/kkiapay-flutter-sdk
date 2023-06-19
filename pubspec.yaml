@@ -14,11 +14,9 @@ dependencies:
 
   webview_flutter: ^3.0.4
   cupertino_icons: ^1.0.3
-  stacked: ^2.2.4
-  stacked_hooks: ^0.2.1
-  stacked_services: ^0.8.13
+  stacked: ^3.2.0
+  stacked_services: ^1.0.0
   logger: ^1.1.0
-  stacked_generator: ^0.5.6
   socket_io_client: ^1.0.2
   intl:
   retrofit:
@@ -31,10 +29,11 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^1.0.0
-  build_runner: ^2.1.5
+  flutter_lints:
+  build_runner:
   hive_generator:
 
+  stacked_generator:
   retrofit_generator:
   json_serializable:
   built_value_generator:
