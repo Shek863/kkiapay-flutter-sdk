@@ -73,20 +73,26 @@ class WidgetBuild extends ViewModelWidget<WidgetBuilderViewModel> {
 
   @override
   Widget build(BuildContext context, WidgetBuilderViewModel viewModel) {
-    return WebView(
-      initialUrl: url,
-      zoomEnabled: false,
-      javascriptMode: JavascriptMode.unrestricted,
-      onWebResourceError: (error) {
-        viewModel.loadingStart();
-        Utils.log.d(error.failingUrl);
-      },
-      onPageStarted: (url) => viewModel.onPageStarted(url),
-      onPageFinished: (url) => viewModel.onPageFinished(url),
-      navigationDelegate: (NavigationRequest request) =>
-          viewModel.onUrlChange(request, (object, context) async {
-        callback(object, context);
-      }, context),
-    );
+
+    WebViewController controller = WebViewController()
+      ..enableZoom(false)
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageStarted: (url) => viewModel.onPageStarted(url),
+          onPageFinished: (url) => viewModel.onPageFinished(url),
+          onWebResourceError: (error) {
+            viewModel.loadingStart();
+            Utils.log.d(error.description);
+          },
+          onNavigationRequest: (NavigationRequest request) =>
+              viewModel.onUrlChange(request, (object, context) async {
+                callback(object, context);
+              }, context),
+        ),
+      )
+      ..loadRequest(Uri.parse(url));
+
+    return WebViewWidget(controller: controller);
   }
 }

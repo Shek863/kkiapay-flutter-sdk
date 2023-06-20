@@ -52,12 +52,12 @@ class WidgetBuild extends ViewModelWidget<WidgetBuilderViewModel> {
 
   @override
   Widget build(BuildContext context, WidgetBuilderViewModel viewModel) {
-    return WebView(
-      initialUrl: url,
-      zoomEnabled: false,
-      javascriptMode: JavascriptMode.unrestricted,
-      onWebResourceError: (error) {
-      }
-    );
+
+    WebViewController controller = WebViewController()
+      ..enableZoom(false)
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..loadRequest(Uri.parse(url));
+
+    return WebViewWidget(controller: controller);
   }
 }
