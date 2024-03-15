@@ -68,6 +68,44 @@ class PaymentRequestData{
   Map<String, dynamic> toJson() => _$PaymentRequestDataToJson(this);
 }
 
+
+
+@JsonSerializable()
+class TransactionId {
+  String? transactionId = "";
+
+  TransactionId({this.transactionId});
+
+  factory TransactionId.fromJson(Map<String, dynamic> json) =>
+      _$TransactionIdFromJson(json);
+  Map<String, dynamic> toJson() => _$TransactionIdToJson(this);
+}
+@JsonSerializable()
+class TransactionStatus {
+  dynamic status;
+  int? amount;
+  int? fees;
+  String? reference = "";
+  String? externalTransactionId = "";
+  String? country = "";
+  String? reason = "";
+  String? partnerId = "";
+
+  TransactionStatus(
+      {this.status,
+        this.amount,
+        this.fees,
+        this.reference,
+        this.externalTransactionId,
+        this.country,
+        this.reason,
+        this.partnerId });
+
+  factory TransactionStatus.fromJson(Map<String, dynamic> json) =>
+      _$TransactionStatusFromJson(json);
+  Map<String, dynamic> toJson() => _$TransactionStatusToJson(this);
+}
+
 @JsonSerializable()
 class CardPaymentRequestData{
 

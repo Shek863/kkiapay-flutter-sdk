@@ -29,7 +29,8 @@ class PaymentRepository {
   /// @return Boolean
   ///
   static Future<void>  claimChannel( xPublicKey,
-      {required Function(String) onSuccess, required Function(Object) onFailure} )
+      { required Function(String) onSuccess,
+        required Function(Object) onFailure } )
   async {
 
     try {
@@ -90,6 +91,21 @@ class PaymentRepository {
       Utils.log.d("completeExceptionally:: ","Cause:: $e ");
     }
 
+  }
+
+  /// use [requestPayment] :::: to init view
+  /// @return Boolean
+  ///
+  static Future<void> getPaymentStatus( String xPublicKey, String transactionId,
+      Function(bool) callBack ) async {
+
+    Utils.client.getTransactionStatus(
+        xPublicKey, TransactionId(transactionId: transactionId))
+        .then((it) async {
+      Utils.log.d("getTransactionStatus== ${it.toJson()}");
+      callBack(it.status.toString() == '1'
+          || it.status.toString() == "SUCCESS");
+    }).catchError((Object obj) { });
   }
 
 }

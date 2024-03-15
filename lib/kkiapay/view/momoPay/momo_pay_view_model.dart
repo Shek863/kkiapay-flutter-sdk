@@ -62,6 +62,7 @@ class WidgetBuilderViewModel extends BaseViewModel {
 
   Future launch(PaymentRequest paymentRequest,
       Function(Map<String, dynamic>, BuildContext)? callback, context) async{
+    setLiveCycleState("INIT");
     setPaymentRequest(paymentRequest);
     if(channel.isEmpty) {
       /// select process switch 'sandbox' value
@@ -167,9 +168,10 @@ class WidgetBuilderViewModel extends BaseViewModel {
             kSocket.onPaymentBack((status, transactionId) {
               setChannel("");
               setDate();
-
-              callback!( { 'requestData': data, 'transactionId': transactionId, 'isPaymentSuccess': status  }, context);
-
+              if(liveCycleState != "FINISH"){
+                setLiveCycleState("FINISH");
+                callback!( { 'requestData': data, 'transactionId': transactionId, 'isPaymentSuccess': status  }, context);
+              }
               kSocket.disconnect();
             });
 
@@ -184,9 +186,21 @@ class WidgetBuilderViewModel extends BaseViewModel {
                       Utils.assertError(object, "");
                       callback!( { 'requestData': data, 'transactionId': '', 'isPaymentSuccess': false  }, context);
                     },
-                    onSuccess: (_paymentRequestData) {
+                    onSuccess: (_paymentRequestData) async {
                       Utils.log.d("requestPayment",">>> onSuccess");
                       setPaymentRequestData(_paymentRequestData!);
+
+                      await Future.delayed(const Duration(seconds: 15));
+                      if(liveCycleState != "FINISH"){
+                        PaymentRepository.getPaymentStatus(xPublicKey,
+                            _paymentRequestData.transactionId,(isSuccess){
+                          setLiveCycleState("FINISH");
+                          callback!( { 'requestData': data,
+                            'transactionId': _paymentRequestData.transactionId,
+                            'isPaymentSuccess': isSuccess  }, context);
+                        });
+                      }
+
                     });
               } else{
                 Utils.log.d("tag",">>> isNotConnected");
@@ -198,6 +212,13 @@ class WidgetBuilderViewModel extends BaseViewModel {
     } catch (e) {
       Utils.log.d("PaymentLoadingViewModel",">>> transactions liveData: $e");
     }
+  }
+
+  late String _liveCycleState = "INIT";
+  String get liveCycleState => _liveCycleState;
+  void setLiveCycleState(String value) {
+    _liveCycleState = value;
+    notifyListeners();
   }
 
   @override

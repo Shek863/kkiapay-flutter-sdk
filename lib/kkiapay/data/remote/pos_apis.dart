@@ -22,6 +22,8 @@ class Apis {
   static const String requestPayment = '/api/v1/payments/request';
   static const String validate = '/api/v1/payments/orange-ci/validate';
 
+  static const String transactionStatus = '/api/v1/transactions/status';
+
 }
 
 @RestApi(baseUrl: Apis.baseUrlSandbox)
@@ -68,6 +70,12 @@ abstract class ApiClient {
       @Header("x-api-key") String xPublicKey,
       @Body() Validate body,
       { @Header("sdk") String sdk = "POS" });
+
+  /// [Payment] transaction status
+  @POST(Apis.transactionStatus)
+  Future<TransactionStatus> getTransactionStatus(
+      @Header("x-api-key") String xPublicKey,
+      @Body() TransactionId body );
 
 }
 

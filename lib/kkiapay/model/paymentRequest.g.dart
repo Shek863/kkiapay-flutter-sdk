@@ -91,6 +91,40 @@ Map<String, dynamic> _$PaymentRequestDataToJson(PaymentRequestData instance) =>
       'status': instance.status,
     };
 
+TransactionId _$TransactionIdFromJson(Map<String, dynamic> json) =>
+    TransactionId(
+      transactionId: json['transactionId'] as String?,
+    );
+
+Map<String, dynamic> _$TransactionIdToJson(TransactionId instance) =>
+    <String, dynamic>{
+      'transactionId': instance.transactionId,
+    };
+
+TransactionStatus _$TransactionStatusFromJson(Map<String, dynamic> json) =>
+    TransactionStatus(
+      status: json['status'],
+      amount: json['amount'] as int?,
+      fees: json['fees'] as int?,
+      reference: json['reference'] as String?,
+      externalTransactionId: json['externalTransactionId'] as String?,
+      country: json['country'] as String?,
+      reason: json['reason'] as String?,
+      partnerId: json['partnerId'] as String?,
+    );
+
+Map<String, dynamic> _$TransactionStatusToJson(TransactionStatus instance) =>
+    <String, dynamic>{
+      'status': instance.status,
+      'amount': instance.amount,
+      'fees': instance.fees,
+      'reference': instance.reference,
+      'externalTransactionId': instance.externalTransactionId,
+      'country': instance.country,
+      'reason': instance.reason,
+      'partnerId': instance.partnerId,
+    };
+
 CardPaymentRequestData _$CardPaymentRequestDataFromJson(
         Map<String, dynamic> json) =>
     CardPaymentRequestData(
