@@ -103,8 +103,14 @@ class PaymentRepository {
         xPublicKey, TransactionId(transactionId: transactionId))
         .then((it) async {
       Utils.log.d("getTransactionStatus== ${it.toJson()}");
-      callBack(it.status.toString() == '1'
+      if(    it.status.toString() == '1'
+          || it.status.toString() == '3'
+          || it.status.toString() == "FAILED"
+          || it.status.toString() == "SUCCESS"
+      ) {
+      callBack( it.status.toString() == '1'
           || it.status.toString() == "SUCCESS");
+      }
     }).catchError((Object obj) { });
   }
 
