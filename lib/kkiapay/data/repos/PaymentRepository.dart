@@ -97,7 +97,9 @@ class PaymentRepository {
   /// @return Boolean
   ///
   static Future<void> getPaymentStatus( String xPublicKey, String transactionId,
-      Function(bool) callBack ) async {
+      Function() pending,
+      Function(bool) callBack
+      ) async {
 
     Utils.client.getTransactionStatus(
         xPublicKey, TransactionId(transactionId: transactionId))
@@ -110,6 +112,8 @@ class PaymentRepository {
       ) {
       callBack( it.status.toString() == '1'
           || it.status.toString() == "SUCCESS");
+      }else {
+        pending();
       }
     }).catchError((Object obj) { });
   }

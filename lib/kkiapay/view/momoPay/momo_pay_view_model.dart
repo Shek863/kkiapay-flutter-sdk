@@ -190,10 +190,27 @@ class WidgetBuilderViewModel extends BaseViewModel {
                       Utils.log.d("requestPayment",">>> onSuccess");
                       setPaymentRequestData(_paymentRequestData!);
 
-                      await Future.delayed(const Duration(seconds: 15));
+                      await Future.delayed(const Duration(seconds: 20));
                       if(liveCycleState != "FINISH"){
                         PaymentRepository.getPaymentStatus(xPublicKey,
-                            _paymentRequestData.transactionId,(isSuccess){
+                            _paymentRequestData.transactionId,() async {
+
+                              await Future.delayed(const Duration(seconds: 5));
+                              if(liveCycleState != "FINISH"){
+                                PaymentRepository.getPaymentStatus(xPublicKey,
+                                    _paymentRequestData.transactionId,(){
+
+                                    },
+                                        (isSuccess){
+                                      setLiveCycleState("FINISH");
+                                      callback!( { 'requestData': data,
+                                        'transactionId': _paymentRequestData.transactionId,
+                                        'isPaymentSuccess': isSuccess  }, context);
+                                    });
+                              }
+
+                            },
+                                (isSuccess){
                           setLiveCycleState("FINISH");
                           callback!( { 'requestData': data,
                             'transactionId': _paymentRequestData.transactionId,
