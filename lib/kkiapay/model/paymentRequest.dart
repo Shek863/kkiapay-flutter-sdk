@@ -192,6 +192,161 @@ class AmonutFeeData {
 }
 
 
+@JsonSerializable()
+class Session {
+  String? apiKey;
+  int? amount;
+  String? mode;
+  String? sessionId;
+  Map<String, dynamic>? pricing;
+  /* "pricing": {
+  "airtel-ne": {
+  "feeSupportedBy": "merchant",
+  "fees": 2,
+  "net": 98,
+  "amount": 100,
+  "settings": {
+  "algorithm": "percentage",
+  "value": 1.9
+  }
+  },
+  "celtiis-bj": {
+  "feeSupportedBy": "customer",
+  "fees": 2,
+  "net": 102,
+  "amount": 100,
+  "settings": {
+  "algorithm": "percentage",
+  "value": 1.9
+  }
+  },
+  "free-sn": {
+  "feeSupportedBy": "customer",
+  "fees": 2,
+  "net": 102,
+  "amount": 100,
+  "settings": {
+  "algorithm": "percentage",
+  "value": 1.9
+  }
+  },
+  "moov-benin": {
+  "feeSupportedBy": "merchant",
+  "fees": 1,
+  "net": 99,
+  "amount": 100,
+  "settings": {
+  "algorithm": "percentage",
+  "value": 1
+  }
+  },
+  "moov-ci": {
+  "feeSupportedBy": "customer",
+  "fees": 2,
+  "net": 102,
+  "amount": 100,
+  "settings": {
+  "algorithm": "percentage",
+  "value": 1.9
+  }
+  },
+  "moov-tg": {
+  "feeSupportedBy": "customer",
+  "fees": 2,
+  "net": 102,
+  "amount": 100,
+  "settings": {
+  "algorithm": "percentage",
+  "value": 1.9
+  }
+  },
+  "mtn-benin": {
+  "feeSupportedBy": "customer",
+  "fees": 2,
+  "net": 102,
+  "amount": 100,
+  "settings": {
+  "algorithm": "percentage",
+  "value": 1.9
+  }
+  },
+  "mtn-ci": {
+  "feeSupportedBy": "customer",
+  "fees": 2,
+  "net": 102,
+  "amount": 100,
+  "settings": {
+  "algorithm": "percentage",
+  "value": 1.9
+  }
+  },
+  "orange-ci": {
+  "feeSupportedBy": "customer",
+  "fees": 2,
+  "net": 102,
+  "amount": 100,
+  "settings": {
+  "algorithm": "percentage",
+  "value": 1.9
+  }
+  },
+  "orange-sn": {
+  "feeSupportedBy": "customer",
+  "fees": 2,
+  "net": 102,
+  "amount": 100,
+  "settings": {
+  "algorithm": "percentage",
+  "value": 1.9
+  }
+  },
+  "tmoney-tg": {
+  "feeSupportedBy": "customer",
+  "fees": 2,
+  "net": 102,
+  "amount": 100,
+  "settings": {
+  "algorithm": "percentage",
+  "value": 1.9
+  }
+  },
+  "wave-ci": {
+  "feeSupportedBy": "customer",
+  "fees": 3,
+  "net": 103,
+  "amount": 100,
+  "settings": {
+  "algorithm": "percentage",
+  "value": 2.5
+  }
+  },
+  "wave-sn": {
+  "feeSupportedBy": "customer",
+  "fees": 2,
+  "net": 102,
+  "amount": 100,
+  "settings": {
+  "algorithm": "percentage",
+  "value": 1.3
+  }
+  }
+  }
+  */
+
+  Session(
+      {
+        this.apiKey ="",
+        this.amount = 1,
+        this.mode = "",
+        this.sessionId = "",
+        this.pricing,
+      });
+
+  factory Session.fromJson(Map<String, dynamic> json) =>
+      _$SessionFromJson(json);
+  Map<String, dynamic> toJson() => _$SessionToJson(this);
+}
+
 
 @JsonSerializable()
 class MobileMoneyAmount {

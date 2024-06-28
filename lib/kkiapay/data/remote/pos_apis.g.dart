@@ -348,6 +348,38 @@ class _ApiClientLive implements ApiClientLive {
   }
 
   @override
+  Future<Session> initSession(
+    String xPublicKey,
+    Map<String, dynamic> body,
+  ) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{r'x-api-key': xPublicKey};
+    _headers.removeWhere((k, v) => v == null);
+    final _data = <String, dynamic>{};
+    _data.addAll(body);
+    final _result =
+        await _dio.fetch<Map<String, dynamic>>(_setStreamType<Session>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              'https://temporal-staging.kkiapay.me/inspector/session/init',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = Session.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
   Future<PaymentRequestData> requestPayment(
     String xPublicKey,
     PaymentRequest body, {

@@ -149,10 +149,10 @@ class WidgetBuilderViewModel extends BaseViewModel {
 
       /** @before */
       PaymentRepositoryLive.claimChannel( xPublicKey,
-          onFailure: (object ) {
+          onFailure: ( object ) {
             Utils.log.d("PaymentLoadingViewModel",">>> claimChannel: ${object.toString()}");
           },
-          onSuccess: (channel) {
+          onSuccess: ( channel ) {
             Utils.log.d("PaymentLoadingViewModel",">>> claimChannel: onSuccess");
 
             PaymentRequest _paymentRequest =  paymentRequest;
@@ -224,6 +224,86 @@ class WidgetBuilderViewModel extends BaseViewModel {
               }
             });
 
+          });
+
+      /** @before */
+      PaymentRepositoryLive.initSession(xPublicKey,
+          {
+            "amount": paymentRequest.amount,
+            "mode": "LIVE"
+          }, onFailure: (object) {
+            Utils.log.d("PaymentLoadingViewModel",">>> claimChannel: ${object.toString()}");
+          }, onSuccess: (channel) {
+            Utils.log.d("PaymentLoadingViewModel",">>> claimChannel: onSuccess");
+
+            PaymentRequest _paymentRequest =  paymentRequest;
+            _paymentRequest.contact = channel;
+            Utils.log.d("PaymentLoadingViewModel paymentRequest:::: ",_paymentRequest.toJson());
+            setPaymentRequest(_paymentRequest);
+            setChannel(channel);
+
+            // var query = "apikey=${developerAccount.api_key}&contact=${paymentRequest.contact}";
+            var query = {"apikey": xPublicKey, "contact": paymentRequest.contact };
+            kSocket = KSocket( queryN: query, baseUrl: Apis.baseUrlLive );
+
+            kSocket.onPaymentBack((status, transactionId) {
+              setChannel("");
+              setDate();
+              if(liveCycleState != "FINISH"){
+                setLiveCycleState("FINISH");
+                callback!( { 'requestData': data, 'transactionId': transactionId, 'isPaymentSuccess': status  }, context);
+              }
+              kSocket.disconnect();
+            });
+
+            kSocket.connect(() {
+              Utils.log.d("tag",">>> onConnect");
+              if(kSocket.isConnected()) {
+                Utils.log.d("tag",">>> isConnected");
+                PaymentRepositoryLive.requestPayment( xPublicKey,
+                    paymentRequest,
+                    onFailure: (object ) {
+                      Utils.log.d("requestPayment",">>> onFailure");
+                      Utils.assertError(object, "");
+                      callback!( { 'requestData': data, 'transactionId': '', 'isPaymentSuccess': false  }, context);
+                    },
+                    onSuccess: (_paymentRequestData) async {
+                      Utils.log.d("requestPayment",">>> onSuccess");
+                      setPaymentRequestData(_paymentRequestData!);
+
+                      await Future.delayed(const Duration(seconds: 20));
+                      if(liveCycleState != "FINISH"){
+                        PaymentRepository.getPaymentStatus(xPublicKey,
+                            _paymentRequestData.transactionId,() async {
+
+                              await Future.delayed(const Duration(seconds: 5));
+                              if(liveCycleState != "FINISH"){
+                                PaymentRepository.getPaymentStatus(xPublicKey,
+                                    _paymentRequestData.transactionId,(){
+
+                                    },
+                                        (isSuccess){
+                                      setLiveCycleState("FINISH");
+                                      callback!( { 'requestData': data,
+                                        'transactionId': _paymentRequestData.transactionId,
+                                        'isPaymentSuccess': isSuccess  }, context);
+                                    });
+                              }
+
+                            },
+                                (isSuccess){
+                              setLiveCycleState("FINISH");
+                              callback!( { 'requestData': data,
+                                'transactionId': _paymentRequestData.transactionId,
+                                'isPaymentSuccess': isSuccess  }, context);
+                            });
+                      }
+
+                    });
+              } else{
+                Utils.log.d("tag",">>> isNotConnected");
+              }
+            });
           });
 
     } catch (e) {

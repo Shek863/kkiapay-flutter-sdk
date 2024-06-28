@@ -222,6 +222,22 @@ Map<String, dynamic> _$AmonutFeeDataToJson(AmonutFeeData instance) =>
       'bank_amount': instance.bank_amount,
     };
 
+Session _$SessionFromJson(Map<String, dynamic> json) => Session(
+      apiKey: json['apiKey'] as String? ?? "",
+      amount: json['amount'] as int? ?? 1,
+      mode: json['mode'] as String? ?? "",
+      sessionId: json['sessionId'] as String? ?? "",
+      pricing: json['pricing'] as Map<String, dynamic>?,
+    );
+
+Map<String, dynamic> _$SessionToJson(Session instance) => <String, dynamic>{
+      'apiKey': instance.apiKey,
+      'amount': instance.amount,
+      'mode': instance.mode,
+      'sessionId': instance.sessionId,
+      'pricing': instance.pricing,
+    };
+
 MobileMoneyAmount _$MobileMoneyAmountFromJson(Map<String, dynamic> json) =>
     MobileMoneyAmount(
       value: json['value'] as int,

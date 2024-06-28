@@ -18,6 +18,7 @@ class Apis {
   static const String baseUrlLive = 'https://api.kkiapay.me';
 
   static const String claimChannel = '/api/v1/utils/claimchannel';
+  static const String initSession = 'https://temporal-staging.kkiapay.me/inspector/session/init';
   static const String getAmountFees = '/api/v1/utils/get-amount-with-fees';
   static const String requestPayment = '/api/v1/payments/request';
   static const String validate = '/api/v1/payments/orange-ci/validate';
@@ -102,6 +103,12 @@ abstract class ApiClientLive {
   Future<String> getChannel(
       @Header("x-api-key") String xPublicKey,
       { @Header("sdk") String sdk = "POS" });
+
+  @POST(Apis.initSession)
+  Future<Session> initSession(
+      @Header("x-api-key") String xPublicKey,
+      @Body() Map<String, dynamic> body,
+      );
 
 
   @POST(Apis.requestPayment)

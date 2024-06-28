@@ -142,6 +142,21 @@ class PaymentRepositoryLive {
 
   }
 
+  static Future<void> initSession(xPublicKey,
+      Map<String, dynamic> body,
+      {required Function(String) onSuccess,
+        required Function(Object) onFailure}) async {
+    try {
+      Utils.clientLive.initSession(xPublicKey,body).then((it) async {
+        onSuccess(it.sessionId!);
+      }).catchError((Object obj) {
+        onFailure(obj);
+      });
+    } catch (e) {
+      Utils.log.d("completeExceptionally:: ", "Cause:: $e ");
+    }
+  }
+
 
   /// we are using [claimChannel] :::: to getting payment channel to listen payment state
   /// @return Boolean
