@@ -51,6 +51,12 @@ abstract class ApiClient {
       @Header("x-api-key") String xPublicKey,
   { @Header("sdk") String sdk = "POS" });
 
+  @POST(Apis.initSession)
+  Future<Session> initSession(
+      @Header("x-api-key") String xPublicKey,
+      @Body() Map<String, dynamic> body,
+      );
+
 
   @POST(Apis.requestPayment)
   Future<PaymentRequestData> requestPayment(

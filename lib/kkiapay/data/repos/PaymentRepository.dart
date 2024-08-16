@@ -46,6 +46,22 @@ class PaymentRepository {
 
   }
 
+  static Future<void> initSession(xPublicKey,
+      Map<String, dynamic> body,
+      {required Function(String) onSuccess,
+        required Function(Object) onFailure})
+  async {
+    try {
+      Utils.client.initSession(xPublicKey,body).then((it) async {
+        onSuccess(it.sessionId!);
+      }).catchError((Object obj) {
+        onFailure(obj);
+      });
+    } catch (e) {
+      Utils.log.d("completeExceptionally:: ", "Cause:: $e ");
+    }
+  }
+
 
   /// we are using [requestPayment] :::: to init view
   /// @return Boolean

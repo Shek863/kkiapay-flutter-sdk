@@ -91,8 +91,12 @@ class WidgetBuilderViewModel extends BaseViewModel {
     try {
 
       /** (2) */
-      PaymentRepository.claimChannel( xPublicKey,
-          onFailure: (object ) {
+      PaymentRepository.initSession(xPublicKey,
+          {
+            "amount": paymentRequest.amount,
+            "mode": "SANDBOX"
+          },
+          onFailure: (object) {
             Utils.log.d("PaymentLoadingViewModel",">>> claimChannel: ${object.toString()}");
           },
           onSuccess: (channel) {
