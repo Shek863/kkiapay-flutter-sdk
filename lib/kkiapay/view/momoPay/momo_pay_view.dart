@@ -29,7 +29,7 @@ class KKiaPayMoMo extends StatefulWidget {
     Key? key,
     required this.amount ,
     this.phone,
-    this.data,
+    this.data="",
     this.paymentMethod,
     this.sandbox,
     required this.apikey,
@@ -125,7 +125,7 @@ class _KKiaPayState extends State<KKiaPayMoMo> with SingleTickerProviderStateMix
             lastname: name!,
             phoneNumber: phone!,
             fullname: name!,
-            reason: "", contact: '', direct: ''), (object, context) async {
+            reason: data.toString(), contact: '', direct: ''), (object, context) async {
           callback(object, context);
         }, context );
       },
