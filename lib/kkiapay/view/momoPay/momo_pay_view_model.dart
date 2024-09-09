@@ -46,7 +46,7 @@ class WidgetBuilderViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  late PaymentRequest _paymentRequest = PaymentRequest(amount: 0, contact: "", country: "", direct: "", email: "", firstname: "", lastname: "", phoneNumber: "", fullname: "", reason: "");
+  late PaymentRequest _paymentRequest = PaymentRequest(amount: 0, contact: "", country: "", direct: "", email: "", firstname: "", lastname: "", phoneNumber: "", fullname: "", reason: "", partnerId: '');
   PaymentRequest get paymentRequest => _paymentRequest;
   void setPaymentRequest (PaymentRequest paymentRequest) {
     _paymentRequest = paymentRequest;

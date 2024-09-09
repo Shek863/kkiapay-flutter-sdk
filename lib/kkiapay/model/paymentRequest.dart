@@ -13,9 +13,10 @@ class PaymentRequest{
    String phoneNumber;
    String fullname = "";
    String reason = "";
+   String partnerId = "";
 
    PaymentRequest({  required this.amount,  required this.contact,  required this.country,  required this.direct,
-    required this.email,  required this.firstname,  required this.lastname,  required this.phoneNumber,  required this.fullname,  required this.reason});
+    required this.email,  required this.partnerId, required this.firstname,  required this.lastname,  required this.phoneNumber,  required this.fullname,  required this.reason});
 
   factory PaymentRequest.fromJson(Map<String, dynamic> json) => _$PaymentRequestFromJson(json);
   Map<String, dynamic> toJson() => _$PaymentRequestToJson(this);

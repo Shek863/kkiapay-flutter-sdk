@@ -24,6 +24,10 @@ class KKiaPayMoMo extends StatefulWidget {
   /// Custom view for payment process
   final Widget? waitingScreen;
 
+  /// @Params partnerId : Your application payment reference
+  /// Ex : 'AxXxXXxId'
+  final String partnerId;
+
 
   const KKiaPayMoMo({
     Key? key,
@@ -38,6 +42,7 @@ class KKiaPayMoMo extends StatefulWidget {
     this.name,
     this.email,
 
+    this.partnerId = "",
     this.waitingScreen,
   }) : super(key: key);
 
@@ -55,7 +60,7 @@ class KKiaPayMoMo extends StatefulWidget {
     this.theme,
     this.name,
     this.email,
-
+    this.partnerId,
     this.waitingScreen,
   );
 
@@ -79,6 +84,9 @@ class _KKiaPayState extends State<KKiaPayMoMo> with SingleTickerProviderStateMix
   /// Custom view for payment process
   final Widget? waitingScreen;
 
+  /// @Params partnerId : Your application payment reference
+  /// Ex : 'AxXxXXxId'
+  final String partnerId;
 
 
   _KKiaPayState(
@@ -93,6 +101,7 @@ class _KKiaPayState extends State<KKiaPayMoMo> with SingleTickerProviderStateMix
       this.name,
       this.email,
 
+      this.partnerId,
       this.waitingScreen,
   );
 
@@ -114,6 +123,7 @@ class _KKiaPayState extends State<KKiaPayMoMo> with SingleTickerProviderStateMix
           'data': data,
           'paymentMethod': paymentMethod,
           'sandbox': sandbox,
+          'partnerId': partnerId,
           'name':name,
           'email': email
         } );
@@ -125,7 +135,7 @@ class _KKiaPayState extends State<KKiaPayMoMo> with SingleTickerProviderStateMix
             lastname: name!,
             phoneNumber: phone!,
             fullname: name!,
-            reason: data.toString(), contact: '', direct: ''), (object, context) async {
+            reason: data.toString(), contact: '', direct: '', partnerId: partnerId), (object, context) async {
           callback(object, context);
         }, context );
       },
