@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kkiapay_flutter_sdk/kkiapay/data/repos/transaction_status_checker.dart';
 import 'package:kkiapay_flutter_sdk/kkiapay/view/widget_builder_view_model.dart';
+import 'package:kkiapay_flutter_sdk/utils/kkiapayConf.sample.dart';
 
 void main() {
   group('isRedirectUrl', () {
@@ -28,6 +29,18 @@ void main() {
       expect(TransactionStatusChecker.outcomeOf({'status': 'PENDING'}), KkiapayTransactionOutcome.pending);
       expect(TransactionStatusChecker.outcomeOf('oops'), KkiapayTransactionOutcome.unknown);
       expect(TransactionStatusChecker.outcomeOf(null), KkiapayTransactionOutcome.unknown);
+    });
+  });
+
+  group('SdkData payment methods', () {
+    test('sends the method as the paymentMethods list the widget reads', () {
+      final map = SdkData(amount: 100, paymentMethod: 'momo').toMap();
+      expect(map['paymentMethods'], ['momo']);
+      expect(map.containsKey('paymentmethod'), isFalse);
+      expect(SdkData(paymentMethod: PaymentMethod.card).toMap()['paymentMethods'], ['card']);
+    });
+    test('omits paymentMethods when no method is set', () {
+      expect(SdkData(amount: 100).toMap().containsKey('paymentMethods'), isFalse);
     });
   });
 }

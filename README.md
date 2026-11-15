@@ -166,3 +166,8 @@ The callback receives `response['status']`, verified with the KkiaPay API
 `response['isPaymentSuccess']` is `true` only for `SUCCESS`, and
 `response['transactionId']` holds the transaction id. A redirect alone is
 never a success: confirm the transaction on your server before delivering.
+
+The `context` passed to the callback is the payment page's: use it to close
+the page (`Navigator.of(context).pop()`). If the customer already left the
+page while the status was being checked, it is no longer mounted: check
+`context.mounted` first.

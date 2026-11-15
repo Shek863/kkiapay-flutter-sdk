@@ -122,7 +122,11 @@ class _KKiaPayState extends State<KKiaPay> with SingleTickerProviderStateMixin {
                       phone: this.phone, data: this.data, sandbox: this.sandbox,
                       apikey: this.apikey, theme: this.theme, name: this.name, email: this.email
                   ) ),
-                  callback: callback,
+                  // The webview is removed from the tree as soon as the
+                  // payment ends (hideWebView), so its own context is dead
+                  // when the result arrives. Hand the integrator this page's
+                  // context instead: it stays valid until the page is popped.
+                  callback: (result, _) => callback(result, this.context),
                   viewModel: model,
               ),
             ),

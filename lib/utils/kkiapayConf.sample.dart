@@ -59,10 +59,21 @@ class SdkData {
   final int? amount;
   final reason, name, email, sandbox, phone, data, apikey, theme, paymentMethod;
 
+  /// The widget only reads `paymentMethods`, as a list (`["momo"]`). Any
+  /// other key (the former `paymentmethod` string) is silently ignored and
+  /// every method is shown. Omitted when no method is set: all are shown.
+  List<String>? get paymentMethods {
+    final method = paymentMethod;
+    if (method == null) return null;
+    if (method is PaymentMethod) return [method.name];
+    if (method is Iterable) return method.map((m) => m is PaymentMethod ? m.name : '$m').toList();
+    return ['$method'];
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'amount': amount,
-      'paymentmethod': paymentMethod,
+      if (paymentMethods != null) 'paymentMethods': paymentMethods,
       'reason': reason,
       'name': name,
       'email': email,

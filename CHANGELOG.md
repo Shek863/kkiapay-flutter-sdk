@@ -11,6 +11,13 @@
   Always check `status` (and confirm server side before delivering).
 - The callback is also called with `CANCELLED` when the customer closes
   the widget (widget events are read from `SDK_CHANNEL`).
+- **Fix**: `paymentMethod` had no effect: it was sent as `paymentmethod`
+  (a string), which the widget ignores. It is now sent as the
+  `paymentMethods` list the widget reads (e.g. `["momo"]`).
+- **Fix**: the callback received the context of the webview, already
+  removed from the tree when the result arrives, so
+  `Navigator.of(context).pop()` crashed with a null check error and the
+  payment page stayed open. It now receives the payment page's context.
 - The redirect is matched on the exact host `redirect.kkiapay.me`, over HTTPS.
 - A load error shows a message with a retry button instead of an endless
   loader.
