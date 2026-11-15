@@ -120,7 +120,8 @@ class _KKiaPayState extends State<KKiaPay> with SingleTickerProviderStateMixin {
                       phone: this.phone, data: this.data, sandbox: this.sandbox,
                       apikey: this.apikey, theme: this.theme, name: this.name, email: this.email
                   ) ),
-                  callback: callback
+                  callback: callback,
+                  viewModel: model,
               ),
             ),
             SizedBox(
