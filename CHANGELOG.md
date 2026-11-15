@@ -1,3 +1,39 @@
+## 1.2.0
+
+- **Fix**: the widget never showed the payment form. The page URL is now
+  `https://widget-v2.kkiapay.me/?<base64>` (was `?=<base64>`, which the
+  widget cannot decode), and the webview is created once instead of being
+  rebuilt (and the page reloaded) on every state change.
+- **Security / breaking**: the callback no longer reports `SUCCESS` just
+  because the widget redirected. The SDK asks the KkiaPay API for the real
+  transaction status and calls back with `status` = `SUCCESS`, `FAILED`,
+  `PENDING` or `CANCELLED`, plus `isPaymentSuccess` and `widgetEvent`.
+  Always check `status` (and confirm server side before delivering).
+- The callback is also called with `CANCELLED` when the customer closes
+  the widget (widget events are read from `SDK_CHANNEL`).
+- **Fix**: `paymentMethod` had no effect: it was sent as `paymentmethod`
+  (a string), which the widget ignores. It is now sent as the
+  `paymentMethods` list the widget reads (e.g. `["momo"]`).
+- **Fix**: the callback received the context of the webview, already
+  removed from the tree when the result arrives, so
+  `Navigator.of(context).pop()` crashed with a null check error and the
+  payment page stayed open. It now receives the payment page's context.
+- The redirect is matched on the exact host `redirect.kkiapay.me`, over HTTPS.
+- A load error shows a message with a retry button instead of an endless
+  loader.
+- No more logging of the widget URL (api key, customer data), payment
+  requests, transaction statuses or raw API error bodies; no `print()`.
+- Native MoMo flow (`KKiaPayMoMo`): new `country` parameter (ISO code,
+  default `BJ`). The country was hardcoded to `BJ`, so numbers from other
+  countries (e.g. Togo, 228) were refused.
+- Native MoMo flow: when opening the session or sending the request fails,
+  the callback is now called with `isPaymentSuccess: false` and an `error`
+  map (`stage`, `statusCode`, `apiStatus`, `message`). A session failure
+  used to leave the page waiting forever.
+- Native MoMo flow: `initSession` no longer targets the offline staging
+  host `temporal-staging.kkiapay.me`.
+- Requires Dart 3 (`sdk: '>=3.0.0 <4.0.0'`); compatible with logger 2.x.
+
 ## 1.1.0
 
 - change webview plugin.

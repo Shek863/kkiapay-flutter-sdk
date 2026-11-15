@@ -132,7 +132,7 @@ class KkiapaySample extends StatelessWidget {
 <tr><td>theme</td><td>String</td><td>No</td><td> the hexadecimal code of the color you want to give to your widget </td></tr>
 <tr><td>apikey</td><td>String</td><td>Yes</td><td>public api key</td></tr>
 <tr><td>sandbox</td><td>Boolean</td><td>No</td><td>The true value of this attribute allows you to switch to test mode</td></tr>
-<tr><td>successCallback</td><td>Function</td><td>Yes</td><td>This function is called once the payment has been successfully made</td></tr>
+<tr><td>callback</td><td>Function</td><td>Yes</td><td>Called once the payment flow ends, with the verified status (see below)</td></tr>
 </table>
 
 ```dart
@@ -150,3 +150,29 @@ the successCallback function takes two parameters in the following order
 
 Please file [issues](https://github.com/kkiapay/kkiapay-flutter-sdk/issues/new)
 to send feedback or report a bug. Thank you!
+
+### Payment result
+
+The callback receives `response['status']`, verified with the KkiaPay API
+(`POST /api/v1/transactions/status`, public key):
+
+| status | meaning |
+|---|---|
+| `SUCCESS` | payment confirmed |
+| `FAILED` | payment refused or failed |
+| `PENDING` | not final yet (e.g. not approved on the phone): check it later |
+| `CANCELLED` | the customer closed the widget |
+
+`response['isPaymentSuccess']` is `true` only for `SUCCESS`, and
+`response['transactionId']` holds the transaction id. A redirect alone is
+never a success: confirm the transaction on your server before delivering.
+
+For the native Mobile Money flow (`KKiaPayMoMo`), pass the `country` of the
+phone number (ISO code, default `BJ`). On failure its callback receives
+`isPaymentSuccess: false` and `error` (`stage`, `statusCode`, `apiStatus`,
+`message`).
+
+The `context` passed to the callback is the payment page's: use it to close
+the page (`Navigator.of(context).pop()`). If the customer already left the
+page while the status was being checked, it is no longer mounted: check
+`context.mounted` first.

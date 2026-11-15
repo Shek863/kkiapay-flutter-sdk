@@ -43,19 +43,22 @@ class Utils {
   ///
   static String getUrl( SdkData sdkData) {
     final base64 = sdkData.toBase64();
-    log.d('$KKiaPayURL/?=$base64');
-    return '$KKiaPayURL/?=$base64';
+    // The widget reads its configuration with
+    // `atob(location.search.substring(1))`: the query must be the bare base64
+    // payload. A leading "=" (`?=<base64>`) makes atob throw and the widget
+    // spins forever without calling any API.
+    // The URL is not logged: it embeds the api key and the customer's data.
+    return '$KKiaPayURL/?$base64';
   }
 
   static void assertError (Object obj, String addCase ,{bool isSplach = false,bool isPaymentCash = false}) async {
     //obj.printError();
     switch (obj.runtimeType) {
-      case DioError:
-        final res = (obj as DioError).response;
-        print("Got error : ${res?.statusCode} -> ${res?.statusMessage}");
-        print("... ...... : ${res?.statusCode} -> ${res?.data}");
-        print("... ...... : ${res?.statusCode} -> ${res?.requestOptions.baseUrl}");
-        print("... ...... : ${res?.statusCode} -> ${res?.requestOptions.uri}");
+      case DioException:
+        // No print() (visible in release logcat) and no response body or
+        // full URL: they can carry customer data.
+        final res = (obj as DioException).response;
+        log.w('KkiaPay API error ${res?.statusCode} on ${res?.requestOptions.path}');
         break;
       default:
         break;

@@ -28,6 +28,11 @@ class KKiaPayMoMo extends StatefulWidget {
   /// Ex : 'AxXxXXxId'
   final String partnerId;
 
+  /// @Params country : ISO code of the phone number's country (BJ, TG, CI,
+  /// SN…). KkiaPay routes the request to that country's operators: a Togo
+  /// number sent with BJ is refused.
+  final String country;
+
 
   const KKiaPayMoMo({
     Key? key,
@@ -44,6 +49,7 @@ class KKiaPayMoMo extends StatefulWidget {
 
     this.partnerId = "",
     this.waitingScreen,
+    this.country = 'BJ',
   }) : super(key: key);
 
 
@@ -62,6 +68,7 @@ class KKiaPayMoMo extends StatefulWidget {
     this.email,
     this.partnerId,
     this.waitingScreen,
+    this.country,
   );
 
 }
@@ -88,6 +95,8 @@ class _KKiaPayState extends State<KKiaPayMoMo> with SingleTickerProviderStateMix
   /// Ex : 'AxXxXXxId'
   final String partnerId;
 
+  final String country;
+
 
   _KKiaPayState(
       this.amount ,
@@ -103,6 +112,7 @@ class _KKiaPayState extends State<KKiaPayMoMo> with SingleTickerProviderStateMix
 
       this.partnerId,
       this.waitingScreen,
+      this.country,
   );
 
 
@@ -124,12 +134,13 @@ class _KKiaPayState extends State<KKiaPayMoMo> with SingleTickerProviderStateMix
           'paymentMethod': paymentMethod,
           'sandbox': sandbox,
           'partnerId': partnerId,
+          'country': country,
           'name':name,
           'email': email
         } );
         model.launch( PaymentRequest(
             amount: amount,
-            country: 'BJ',
+            country: country,
             email: email!,
             firstname: name!,
             lastname: name!,

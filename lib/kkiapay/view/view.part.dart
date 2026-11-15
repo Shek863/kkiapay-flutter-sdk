@@ -32,7 +32,6 @@ class LoadingView extends ViewModelWidget<WidgetBuilderViewModel> {
                             : Size(95, 95));
                       },
                       builder: (_, Size? size, child) {
-                        Utils.log.d(size);
                         return Container(
                           width: size?.width,
                           height: size?.height,
@@ -64,35 +63,93 @@ class LoadingView extends ViewModelWidget<WidgetBuilderViewModel> {
   }
 }
 
-class WidgetBuild extends ViewModelWidget<WidgetBuilderViewModel> {
+/// Hosts the KkiaPay web widget.
+///
+/// The [WebViewController] is created once, in [State.initState]. It used to
+/// be created (and the page reloaded) in `build()`, which runs on every
+/// `notifyListeners()` of [WidgetBuilderViewModel]: the loading animation
+/// (every ~3 s) and `onPageStarted` itself, so the page reloaded forever.
+class WidgetBuild extends StatefulWidget {
   final Function(Map<String, dynamic>, BuildContext) callback;
   final String url;
+  final WidgetBuilderViewModel viewModel;
 
-  const WidgetBuild({Key? key, required this.url, required this.callback})
-      : super(key: key);
+  const WidgetBuild({
+    Key? key,
+    required this.url,
+    required this.callback,
+    required this.viewModel,
+  }) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetBuilderViewModel viewModel) {
+  State<WidgetBuild> createState() => _WidgetBuildState();
+}
 
-    WebViewController controller = WebViewController()
+class _WidgetBuildState extends State<WidgetBuild> {
+  late final WebViewController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    final viewModel = widget.viewModel;
+    _controller = WebViewController()
       ..enableZoom(false)
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      // The widget reports its lifecycle (PAYMENT_SUCCESS, PAYMENT_FAILED,
+      // CLOSE_WIDGET…) with `SDK_CHANNEL.postMessage(JSON)`.
+      ..addJavaScriptChannel('SDK_CHANNEL',
+          onMessageReceived: (message) => viewModel.onWidgetMessage(
+              message.message, widget.callback, context))
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (url) => viewModel.onPageStarted(url),
           onPageFinished: (url) => viewModel.onPageFinished(url),
           onWebResourceError: (error) {
-            viewModel.loadingStart();
-            Utils.log.d(error.description);
+            Utils.log.w('KkiaPay widget: ${error.errorCode} ${error.description}');
+            // Show an error with a retry button instead of an endless loader
+            // when the widget page itself cannot be loaded.
+            if (error.isForMainFrame ?? true) {
+              viewModel.setLoadError(error.description);
+            }
           },
           onNavigationRequest: (NavigationRequest request) =>
-              viewModel.onUrlChange(request, (object, context) async {
-                callback(object, context);
-              }, context),
+              viewModel.onUrlChange(request, widget.callback, context),
         ),
       )
-      ..loadRequest(Uri.parse(url));
+      ..loadRequest(Uri.parse(widget.url));
+  }
 
-    return WebViewWidget(controller: controller);
+  @override
+  Widget build(BuildContext context) {
+    return WebViewWidget(controller: _controller);
+  }
+}
+
+
+/// Shown when the widget page cannot be loaded.
+class LoadErrorView extends ViewModelWidget<WidgetBuilderViewModel> {
+  const LoadErrorView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetBuilderViewModel viewModel) {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.all(24),
+      alignment: Alignment.center,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.wifi_off, size: 48, color: Colors.black54),
+          const SizedBox(height: 16),
+          const Text(
+            'Impossible de charger le paiement.\nVérifiez votre connexion.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16, color: Colors.black87),
+          ),
+          const SizedBox(height: 16),
+          TextButton(onPressed: viewModel.retry, child: const Text('Réessayer')),
+        ],
+      ),
+    );
   }
 }
