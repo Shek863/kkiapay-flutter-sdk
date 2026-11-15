@@ -43,8 +43,12 @@ class Utils {
   ///
   static String getUrl( SdkData sdkData) {
     final base64 = sdkData.toBase64();
-    log.d('$KKiaPayURL/?=$base64');
-    return '$KKiaPayURL/?=$base64';
+    // The widget reads its configuration with
+    // `atob(location.search.substring(1))`: the query must be the bare base64
+    // payload. A leading "=" (`?=<base64>`) makes atob throw and the widget
+    // spins forever without calling any API.
+    // The URL is not logged: it embeds the api key and the customer's data.
+    return '$KKiaPayURL/?$base64';
   }
 
   static void assertError (Object obj, String addCase ,{bool isSplach = false,bool isPaymentCash = false}) async {

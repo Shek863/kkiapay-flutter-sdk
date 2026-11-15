@@ -44,7 +44,6 @@ class WidgetBuilderViewModel extends BaseViewModel {
       Function(Map<String, dynamic>, BuildContext)? callback, context)
   async {
     if (request.url.startsWith(KKiaPayRedirectURL)) {
-      print('blocking navigation to $request}');
 
       hideWebView ();
       loadingStart ();
@@ -64,21 +63,18 @@ class WidgetBuilderViewModel extends BaseViewModel {
       return NavigationDecision.prevent;
     }
 
-    print('allowing navigation to $request');
     return NavigationDecision.navigate;
   }
 
+  // Page URLs are not logged: the widget URL embeds the api key and the
+  // customer's data (name, phone, email).
   void onPageStarted (url) {
-    Utils.log.d('onPageStarted:::: url = $url');
     loadingStart();
-    Utils.log.d('loadingStarted');
   }
 
   void onPageFinished ( url) async {
-    Utils.log.d('onPageFinished:::: url = $url');
     await Future.delayed(const Duration(seconds: 2));
     loadingFinish();
-    Utils.log.d('loadingFinish');
   }
 
 
