@@ -4,11 +4,16 @@ import 'dart:ui';
 
 const KKiaPayURL = "https://widget-v2.kkiapay.me";
 const baseUrl = 'https://api-dev.kkiapay.me';
-const KKiaPayRedirectURL = "http://redirect.kkiapay.me";
+/// Callback URL handed to the widget. The widget navigates to it (plus
+/// `transaction_id`) at the end of the payment flow; the SDK intercepts that
+/// navigation, so the page itself is never loaded. HTTPS avoids any
+/// cleartext request if the interception were ever bypassed.
+const KKiaPayRedirectURL = "https://redirect.kkiapay.me";
+const KKiaPayRedirectHost = "redirect.kkiapay.me";
 const key = "xxxxxxxxxxxxxxxxxxxxxx";
 
 /// API Key */
-const callback = 'http://redirect.kkiapay.me';
+const callback = KKiaPayRedirectURL;
 
 /// Webhook */
 const sdk = "android";

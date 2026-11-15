@@ -94,6 +94,7 @@ class _KKiaPayState extends State<KKiaPay> with SingleTickerProviderStateMixin {
             statusBarBrightness: Brightness.light,
             statusBarIconBrightness: Brightness.light
         ));
+        model.setApiKey(apikey);
         model.setData ({
           'amount':amount,
           'phone': phone,
@@ -115,6 +116,7 @@ class _KKiaPayState extends State<KKiaPay> with SingleTickerProviderStateMixin {
             Container (
               margin:  Platform.isIOS ? null : EdgeInsets.only( top: MediaQuery.of(context).viewPadding.top),
               child: model.hide ? null : WidgetBuild (
+                  key: ValueKey(model.attempt),
                   url: Utils.getUrl( SdkData(
                       amount: this.amount, paymentMethod: this.paymentMethod?.name,
                       phone: this.phone, data: this.data, sandbox: this.sandbox,
@@ -126,7 +128,8 @@ class _KKiaPayState extends State<KKiaPay> with SingleTickerProviderStateMixin {
             ),
             SizedBox(
               child: model.onLoading ? LoadingView() : null,
-            )
+            ),
+            if (model.loadError != null) const LoadErrorView(),
           ],
         )
       ),

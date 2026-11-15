@@ -95,20 +95,25 @@ class _WidgetBuildState extends State<WidgetBuild> {
     _controller = WebViewController()
       ..enableZoom(false)
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      // The widget reports its lifecycle (PAYMENT_SUCCESS, PAYMENT_FAILED,
+      // CLOSE_WIDGET…) with `SDK_CHANNEL.postMessage(JSON)`.
+      ..addJavaScriptChannel('SDK_CHANNEL',
+          onMessageReceived: (message) => viewModel.onWidgetMessage(
+              message.message, widget.callback, context))
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (url) => viewModel.onPageStarted(url),
           onPageFinished: (url) => viewModel.onPageFinished(url),
           onWebResourceError: (error) {
             Utils.log.w('KkiaPay widget: ${error.errorCode} ${error.description}');
-            // Show the webview (and its error page) instead of an endless
-            // loader when the widget page itself cannot be loaded.
-            if (error.isForMainFrame ?? true) viewModel.loadingFinish();
+            // Show an error with a retry button instead of an endless loader
+            // when the widget page itself cannot be loaded.
+            if (error.isForMainFrame ?? true) {
+              viewModel.setLoadError(error.description);
+            }
           },
           onNavigationRequest: (NavigationRequest request) =>
-              viewModel.onUrlChange(request, (object, context) async {
-                widget.callback(object, context);
-              }, context),
+              viewModel.onUrlChange(request, widget.callback, context),
         ),
       )
       ..loadRequest(Uri.parse(widget.url));
@@ -117,5 +122,34 @@ class _WidgetBuildState extends State<WidgetBuild> {
   @override
   Widget build(BuildContext context) {
     return WebViewWidget(controller: _controller);
+  }
+}
+
+
+/// Shown when the widget page cannot be loaded.
+class LoadErrorView extends ViewModelWidget<WidgetBuilderViewModel> {
+  const LoadErrorView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetBuilderViewModel viewModel) {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.all(24),
+      alignment: Alignment.center,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.wifi_off, size: 48, color: Colors.black54),
+          const SizedBox(height: 16),
+          const Text(
+            'Impossible de charger le paiement.\nVérifiez votre connexion.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16, color: Colors.black87),
+          ),
+          const SizedBox(height: 16),
+          TextButton(onPressed: viewModel.retry, child: const Text('Réessayer')),
+        ],
+      ),
+    );
   }
 }
