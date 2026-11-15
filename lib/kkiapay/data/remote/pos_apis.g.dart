@@ -110,7 +110,7 @@ class _ApiClient implements ApiClient {
     )
             .compose(
               _dio.options,
-              'https://temporal-staging.kkiapay.me/inspector/session/init',
+              'https://inspector.kkiapay.me/session/init',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -398,7 +398,7 @@ class _ApiClientLive implements ApiClientLive {
     )
             .compose(
               _dio.options,
-              'https://temporal-staging.kkiapay.me/inspector/session/init',
+              'https://inspector.kkiapay.me/session/init',
               queryParameters: queryParameters,
               data: _data,
             )

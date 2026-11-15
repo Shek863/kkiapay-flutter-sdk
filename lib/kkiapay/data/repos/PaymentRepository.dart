@@ -59,8 +59,6 @@ class PaymentRepository {
   static Future<void> requestPayment(xPublicKey, PaymentRequest paymentRequest,
       {required Function(PaymentRequestData?) onSuccess,
       required Function(Object) onFailure}) async {
-    Utils.log
-        .d("PaymentRequest::Cause:: ${paymentRequest.toJson().toString()} ");
 
     try {
       Utils.client.requestPayment(xPublicKey, paymentRequest).then((it) async {
@@ -99,7 +97,6 @@ class PaymentRepository {
         .getTransactionStatus(
             xPublicKey, TransactionId(transactionId: transactionId))
         .then((it) async {
-      Utils.log.d("getTransactionStatus== ${it.toJson()}");
       if (it.status.toString() == '1' ||
           it.status.toString() == '3' ||
           it.status.toString() == "FAILED" ||
@@ -170,8 +167,6 @@ class PaymentRepositoryLive {
   static Future<void> requestPayment(xPublicKey, PaymentRequest paymentRequest,
       {required Function(PaymentRequestData?) onSuccess,
       required Function(Object) onFailure}) async {
-    Utils.log
-        .d("PaymentRequest::Cause:: ${paymentRequest.toJson().toString()} ");
 
     try {
       Utils.clientLive

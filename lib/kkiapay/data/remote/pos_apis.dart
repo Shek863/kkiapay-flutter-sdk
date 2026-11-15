@@ -18,7 +18,9 @@ class Apis {
   static const String baseUrlLive = 'https://api.kkiapay.me';
 
   static const String claimChannel = '/api/v1/utils/claimchannel';
-  static const String initSession = 'https://temporal-staging.kkiapay.me/inspector/session/init';
+  // Was 'https://temporal-staging.kkiapay.me/inspector/session/init': a
+  // staging host (now offline) used even by the live client.
+  static const String initSession = 'https://inspector.kkiapay.me/session/init';
   static const String getAmountFees = '/api/v1/utils/get-amount-with-fees';
   static const String requestPayment = '/api/v1/payments/request';
   static const String validate = '/api/v1/payments/orange-ci/validate';

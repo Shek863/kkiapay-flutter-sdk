@@ -54,12 +54,11 @@ class Utils {
   static void assertError (Object obj, String addCase ,{bool isSplach = false,bool isPaymentCash = false}) async {
     //obj.printError();
     switch (obj.runtimeType) {
-      case DioError:
-        final res = (obj as DioError).response;
-        print("Got error : ${res?.statusCode} -> ${res?.statusMessage}");
-        print("... ...... : ${res?.statusCode} -> ${res?.data}");
-        print("... ...... : ${res?.statusCode} -> ${res?.requestOptions.baseUrl}");
-        print("... ...... : ${res?.statusCode} -> ${res?.requestOptions.uri}");
+      case DioException:
+        // No print() (visible in release logcat) and no response body or
+        // full URL: they can carry customer data.
+        final res = (obj as DioException).response;
+        log.w('KkiaPay API error ${res?.statusCode} on ${res?.requestOptions.path}');
         break;
       default:
         break;
