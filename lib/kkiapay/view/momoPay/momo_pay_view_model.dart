@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
@@ -105,8 +106,7 @@ class WidgetBuilderViewModel extends BaseViewModel {
       PaymentRepository.initSession(
           xPublicKey, {"amount": paymentRequest.amount, "mode": "SANDBOX"},
           onFailure: (object) {
-        Utils.log
-            .d("PaymentLoadingViewModel>>> claimChannel: ${object.toString()}");
+        _fail(callback, context, 'initSession', object);
       }, onSuccess: (channel) {
         Utils.log.d("PaymentLoadingViewModel>>> claimChannel: onSuccess");
 
@@ -139,13 +139,8 @@ class WidgetBuilderViewModel extends BaseViewModel {
             /** (3) */
             PaymentRepository.requestPayment(xPublicKey, paymentRequest,
                 onFailure: (object) {
-              Utils.log.d("requestPayment>>> onFailure");
               Utils.assertError(object, "");
-              callback!({
-                'requestData': data,
-                'transactionId': '',
-                'isPaymentSuccess': false
-              }, context);
+              _fail(callback, context, 'requestPayment', object);
             }, onSuccess: (paymentRequestData) {
               Utils.log.d("requestPayment>>> onSuccess");
               setPaymentRequestData(paymentRequestData!);
@@ -167,8 +162,7 @@ class WidgetBuilderViewModel extends BaseViewModel {
       PaymentRepositoryLive.initSession(
           xPublicKey, {"amount": paymentRequest.amount, "mode": "LIVE"},
           onFailure: (object) {
-        Utils.log
-            .d("PaymentLoadingViewModel>>> claimChannel: ${object.toString()}");
+        _fail(callback, context, 'initSession', object);
       }, onSuccess: (channel) {
         Utils.log.d("PaymentLoadingViewModel>>> claimChannel: onSuccess");
 
@@ -204,13 +198,8 @@ class WidgetBuilderViewModel extends BaseViewModel {
             Utils.log.d("tag>>> isConnected");
             PaymentRepositoryLive.requestPayment(xPublicKey, paymentRequest,
                 onFailure: (object) {
-              Utils.log.d("requestPayment>>> onFailure");
               Utils.assertError(object, "");
-              callback!({
-                'requestData': data,
-                'transactionId': '',
-                'isPaymentSuccess': false
-              }, context);
+              _fail(callback, context, 'requestPayment', object);
             }, onSuccess: (paymentRequestData) async {
               Utils.log.d("requestPayment>>> onSuccess");
               setPaymentRequestData(paymentRequestData!);
@@ -250,6 +239,38 @@ class WidgetBuilderViewModel extends BaseViewModel {
     } catch (e) {
       Utils.log.d("PaymentLoadingViewModel>>> transactions liveData: $e");
     }
+  }
+
+  /// Ends the flow with a failure the integrator can see. Opening the
+  /// session or sending the request used to fail silently (the page waited
+  /// forever) or with an empty result and no reason.
+  void _fail(Function(Map<String, dynamic>, BuildContext)? callback, context,
+      String stage, Object error) {
+    if (liveCycleState == "FINISH") return;
+    setLiveCycleState("FINISH");
+    callback?.call({
+      'requestData': data,
+      'transactionId': '',
+      'isPaymentSuccess': false,
+      'error': describeError(stage, error),
+    }, context);
+  }
+
+  /// Error details safe to log: the failing step, the HTTP status and the
+  /// API's own status/message. No headers (api key) and no request body
+  /// (customer data). Exposed for tests.
+  static Map<String, dynamic> describeError(String stage, Object error) {
+    if (error is DioException) {
+      final body = error.response?.data;
+      return {
+        'stage': stage,
+        'statusCode': error.response?.statusCode,
+        if (body is Map && body['status'] != null) 'apiStatus': '${body['status']}',
+        if (body is Map && body['message'] != null) 'message': '${body['message']}',
+        if (error.response == null) 'message': error.type.name,
+      };
+    }
+    return {'stage': stage, 'message': error.runtimeType.toString()};
   }
 
   late String _liveCycleState = "INIT";

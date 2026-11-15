@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kkiapay_flutter_sdk/kkiapay/view/momoPay/momo_pay_view_model.dart' as momo;
 import 'package:kkiapay_flutter_sdk/kkiapay/data/repos/transaction_status_checker.dart';
 import 'package:kkiapay_flutter_sdk/kkiapay/view/widget_builder_view_model.dart';
 import 'package:kkiapay_flutter_sdk/utils/kkiapayConf.sample.dart';
@@ -41,6 +43,26 @@ void main() {
     });
     test('omits paymentMethods when no method is set', () {
       expect(SdkData(amount: 100).toMap().containsKey('paymentMethods'), isFalse);
+    });
+  });
+
+  group('MoMo describeError', () {
+    test('keeps the step, HTTP status and API message only', () {
+      final options = RequestOptions(path: '/api/v1/payments/request', headers: {'x-api-key': 'secret'});
+      final error = DioException(
+        requestOptions: options,
+        response: Response(requestOptions: options, statusCode: 400,
+            data: {'status': 'INVALID_COUNTRY', 'message': 'Unsupported operator'}),
+      );
+      final d = momo.WidgetBuilderViewModel.describeError('requestPayment', error);
+      expect(d, {'stage': 'requestPayment', 'statusCode': 400,
+          'apiStatus': 'INVALID_COUNTRY', 'message': 'Unsupported operator'});
+      expect(d.toString(), isNot(contains('secret')));
+    });
+    test('reports network errors without a response', () {
+      final error = DioException(requestOptions: RequestOptions(path: '/x'), type: DioExceptionType.connectionError);
+      expect(momo.WidgetBuilderViewModel.describeError('initSession', error),
+          {'stage': 'initSession', 'statusCode': null, 'message': 'connectionError'});
     });
   });
 }

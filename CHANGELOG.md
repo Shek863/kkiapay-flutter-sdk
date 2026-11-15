@@ -23,6 +23,13 @@
   loader.
 - No more logging of the widget URL (api key, customer data), payment
   requests, transaction statuses or raw API error bodies; no `print()`.
+- Native MoMo flow (`KKiaPayMoMo`): new `country` parameter (ISO code,
+  default `BJ`). The country was hardcoded to `BJ`, so numbers from other
+  countries (e.g. Togo, 228) were refused.
+- Native MoMo flow: when opening the session or sending the request fails,
+  the callback is now called with `isPaymentSuccess: false` and an `error`
+  map (`stage`, `statusCode`, `apiStatus`, `message`). A session failure
+  used to leave the page waiting forever.
 - Native MoMo flow: `initSession` no longer targets the offline staging
   host `temporal-staging.kkiapay.me`.
 - Requires Dart 3 (`sdk: '>=3.0.0 <4.0.0'`); compatible with logger 2.x.
